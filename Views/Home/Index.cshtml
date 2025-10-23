@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to Social Media App</h1>
+    <p>Your social networking platform with authentication.</p>
+    
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Login</h5>
+                    <p class="card-text">Already have an account? Sign in here.</p>
+                    <a asp-controller="Home" asp-action="Login" class="btn btn-primary">Login</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Register</h5>
+                    <p class="card-text">New to our platform? Create an account.</p>
+                    <a asp-controller="Home" asp-action="Register" class="btn btn-success">Register</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
