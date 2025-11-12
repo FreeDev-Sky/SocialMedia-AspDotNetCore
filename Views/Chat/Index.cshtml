@@ -1,0 +1,226 @@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Chat";
+    var chatType = ViewBag.ChatType as string ?? "global";
+    var selectedUserId = ViewBag.SelectedUserId as string;
+    var selectedUserName = ViewBag.SelectedUserName as string ?? "Global Chat";
+}
+
+<div class="container-fluid fade-in">
+    <div class="row">
+        <!-- User List Sidebar -->
+        <div class="col-md-3 col-lg-2 mb-3">
+            <div class="card shadow-custom">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-users"></i> Users
+                    </h5>
+                </div>
+                <div class="list-group list-group-flush" style="max-height: 600px; overflow-y: auto;">
+                    <a href="@Url.Action("Index", "Chat")" 
+                       class="list-group-item list-group-item-action @(chatType == "global" ? "active" : "")"
+                       onclick="if(typeof clearMessages === 'function') clearMessages();">
+                        <i class="fas fa-globe"></i> <strong>Global Chat</strong>
+                    </a>
+                    @if (ViewBag.Users != null)
+                    {
+                        @foreach (var user in ViewBag.Users)
+                        {
+                            <a href="@Url.Action("Index", "Chat", new { userId = user.Id })" 
+                               class="list-group-item list-group-item-action @(selectedUserId == user.Id ? "active" : "")"
+                               onclick="if(typeof clearMessages === 'function') clearMessages();">
+                                <i class="fas fa-user"></i> @user.Name
+                                <small class="text-muted d-block">@user.Email</small>
+                            </a>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="col-md-9 col-lg-10">
+            <div class="card shadow-custom">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-comments"></i> @selectedUserName
+                        @if (chatType == "private")
+                        {
+                            <span class="badge bg-light text-dark ms-2">Private</span>
+                        }
+                    </h3>
+                </div>
+                <div class="card-body p-0">
+                    <div id="chatContainer" class="chat-container">
+                        <div id="messagesList" class="messages-list">
+                            @if (ViewBag.Messages != null)
+                            {
+                                @foreach (var message in ViewBag.Messages)
+                                {
+                                    <div class="message-item @(message.UserId == ViewBag.CurrentUserId ? "message-sent" : "message-received")" data-message-id="@message.Id">
+                                        <div class="message-header">
+                                            <strong class="message-user">@message.UserName</strong>
+                                            <span class="message-time">@message.CreatedAt.ToString("MM/dd/yyyy HH:mm")</span>
+                                        </div>
+                                        <div class="message-content">@message.Content</div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div id="typingIndicator" class="typing-indicator" style="display: none;">
+                            <span>Someone is typing...</span>
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <div class="input-group">
+                            <input type="text" id="messageInput" class="form-control" placeholder="Type your message here..." maxlength="1000" />
+                            <button class="btn btn-primary" id="sendButton" type="button">
+                                <i class="fas fa-paper-plane"></i> Send
+                            </button>
+                        </div>
+                        <div id="connectionStatus" class="connection-status mt-2">
+                            <span id="statusText" class="badge bg-secondary">Connecting...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script src="~/js/chat.js" asp-append-version="true"></script>
+    <script>
+        // Pass chat type and selected user ID to JavaScript
+        window.chatType = '@chatType';
+        window.selectedUserId = '@(selectedUserId ?? "")';
+        window.currentUserId = '@ViewBag.CurrentUserId';
+    </script>
+}
+
+<style>
+    .chat-container {
+        height: 500px;
+        overflow-y: auto;
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .messages-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .message-item {
+        background-color: white;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        animation: slideIn 0.3s ease-out;
+        max-width: 80%;
+    }
+
+    .message-sent {
+        align-self: flex-end;
+        background-color: #0d6efd;
+        color: white;
+    }
+
+    .message-sent .message-user,
+    .message-sent .message-time {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .message-received {
+        align-self: flex-start;
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .message-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .message-user {
+        color: #0d6efd;
+        font-weight: 600;
+    }
+
+    .message-time {
+        color: #6c757d;
+        font-size: 0.75rem;
+    }
+
+    .message-content {
+        color: #212529;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+    }
+
+    .message-sent .message-content {
+        color: white;
+    }
+
+    .typing-indicator {
+        padding: 0.5rem 1rem;
+        color: #6c757d;
+        font-style: italic;
+        font-size: 0.875rem;
+    }
+
+    .chat-input-container {
+        padding: 1rem;
+        background-color: white;
+    }
+
+    .connection-status {
+        text-align: center;
+    }
+
+    #messageInput:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+
+    #sendButton:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .badge.bg-success {
+        background-color: #198754 !important;
+    }
+
+    .badge.bg-danger {
+        background-color: #dc3545 !important;
+    }
+
+    .badge.bg-secondary {
+        background-color: #6c757d !important;
+    }
+
+    .list-group-item.active {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+</style>

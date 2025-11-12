@@ -358,15 +358,15 @@ SocialMediaDb.db
 SocialMediaDb.db-shm
 SocialMediaDb.db-wal
 
-# Entity Framework Migrations
-Migrations/
+# Entity Framework Migrations (commented - migrations should be committed)
+# Migrations/
 
 # ASP.NET Core specific
 appsettings.Production.json
 appsettings.Staging.json
-appsettings.Development.json
-appsettings.*.json
-!appsettings.json
+# appsettings.Development.json (keep this - it's needed for local dev)
+# appsettings.*.json
+# !appsettings.json
 
 # User secrets
 secrets.json

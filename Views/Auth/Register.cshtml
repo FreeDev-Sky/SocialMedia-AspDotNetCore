@@ -1,4 +1,6 @@
+@model SocialMedia_AspDotNetCore.DTOs.RegisterDto
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
 @{
     ViewData["Title"] = "Register";
 }
@@ -22,35 +24,40 @@
                     @Html.AntiForgeryToken()
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="firstName" class="form-label">
+                            <label asp-for="FirstName" class="form-label">
                                 <i class="fas fa-user"></i> First Name
                             </label>
-                            <input type="text" class="form-control" id="firstName" name="firstName" placeholder="John" required>
+                            <input asp-for="FirstName" class="form-control" placeholder="John" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="lastName" class="form-label">
+                            <label asp-for="LastName" class="form-label">
                                 <i class="fas fa-user"></i> Last Name
                             </label>
-                            <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Doe" required>
+                            <input asp-for="LastName" class="form-control" placeholder="Doe" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="email" class="form-label">
+                        <label asp-for="Email" class="form-label">
                             <i class="fas fa-envelope"></i> Email Address
                         </label>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="john.doe@example.com" required>
+                        <input asp-for="Email" class="form-control" placeholder="john.doe@example.com" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
-                        <label for="password" class="form-label">
+                        <label asp-for="Password" class="form-label">
                             <i class="fas fa-lock"></i> Password
                         </label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                        <input asp-for="Password" class="form-control" placeholder="Enter your password" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
                     <div class="mb-4">
-                        <label for="confirmPassword" class="form-label">
+                        <label asp-for="ConfirmPassword" class="form-label">
                             <i class="fas fa-lock"></i> Confirm Password
                         </label>
-                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+                        <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm your password" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                     </div>
                     <button type="submit" class="btn btn-success w-100 btn-lg">
                         <i class="fas fa-user-plus"></i> Create Account
@@ -59,7 +66,7 @@
                 <div class="mt-4 text-center">
                     <p class="text-muted mb-0">
                         Already have an account? 
-                        <a asp-controller="Home" asp-action="Login" class="text-gradient fw-bold">
+                        <a asp-action="Login" class="text-gradient fw-bold">
                             <i class="fas fa-sign-in-alt"></i> Login here
                         </a>
                     </p>
@@ -68,3 +75,8 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
