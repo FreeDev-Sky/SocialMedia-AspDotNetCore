@@ -1,0 +1,80 @@
+@model SocialMedia_AspDotNetCore.ViewModels.UserProfileViewModel
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="profile-card fade-in">
+    <div class="profile-header">
+        <div class="profile-avatar">
+            @(Model.FirstName?.Substring(0, 1).ToUpper() ?? Model.Email?.Substring(0, 1).ToUpper() ?? "U")
+        </div>
+        <h2 class="text-gradient mb-2">@Model.FirstName @Model.LastName</h2>
+        <p class="text-muted mb-0">@Model.Email</p>
+    </div>
+
+    <div class="profile-info">
+        <div class="info-item">
+            <div class="info-label">
+                <i class="fas fa-envelope"></i> Email
+            </div>
+            <div class="info-value">@Model.Email</div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-label">
+                <i class="fas fa-user"></i> First Name
+            </div>
+            <div class="info-value">@Model.FirstName</div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-label">
+                <i class="fas fa-user"></i> Last Name
+            </div>
+            <div class="info-value">@Model.LastName</div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-label">
+                <i class="fas fa-birthday-cake"></i> Birthday
+            </div>
+            <div class="info-value @(Model.Birthday == null ? "empty" : "")">
+                @(Model.Birthday?.ToString("MMMM dd, yyyy") ?? "Not set")
+            </div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-label">
+                <i class="fas fa-venus-mars"></i> Gender
+            </div>
+            <div class="info-value @(string.IsNullOrEmpty(Model.Gender) ? "empty" : "")">
+                @(Model.Gender ?? "Not set")
+            </div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-label">
+                <i class="fas fa-phone"></i> Phone Number
+            </div>
+            <div class="info-value @(string.IsNullOrEmpty(Model.PhoneNumber) ? "empty" : "")">
+                @(Model.PhoneNumber ?? "Not set")
+            </div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-label">
+                <i class="fas fa-map-marker-alt"></i> Address
+            </div>
+            <div class="info-value @(string.IsNullOrEmpty(Model.Address) ? "empty" : "")">
+                @(Model.Address ?? "Not set")
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-center">
+        <a class="btn btn-warning btn-lg" href="@Url.Action("Edit")">
+            <i class="fas fa-edit"></i> Edit Profile
+        </a>
+    </div>
+</div>

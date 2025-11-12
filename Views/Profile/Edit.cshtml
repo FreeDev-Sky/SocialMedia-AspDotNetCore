@@ -1,0 +1,93 @@
+@model SocialMedia_AspDotNetCore.ViewModels.UserProfileViewModel
+
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<div class="form-container">
+    <div class="form-card fade-in">
+        <div class="text-center mb-4">
+            <h2 class="text-gradient mb-2">
+                <i class="fas fa-user-edit"></i> Edit Profile
+            </h2>
+            <p class="text-muted">Update your profile information</p>
+        </div>
+
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="ProfileId" />
+            
+            <div class="mb-4">
+                <label asp-for="Email" class="form-label">
+                    <i class="fas fa-envelope"></i> Email
+                </label>
+                <input asp-for="Email" class="form-control" readonly />
+                <small class="text-muted">Email cannot be changed</small>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label asp-for="FirstName" class="form-label">
+                        <i class="fas fa-user"></i> First Name
+                    </label>
+                    <input asp-for="FirstName" class="form-control" readonly />
+                </div>
+                <div class="col-md-6 mb-4">
+                    <label asp-for="LastName" class="form-label">
+                        <i class="fas fa-user"></i> Last Name
+                    </label>
+                    <input asp-for="LastName" class="form-control" readonly />
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Birthday" class="form-label">
+                    <i class="fas fa-birthday-cake"></i> Birthday
+                </label>
+                <input asp-for="Birthday" class="form-control" type="date" />
+                <span asp-validation-for="Birthday" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Gender" class="form-label">
+                    <i class="fas fa-venus-mars"></i> Gender
+                </label>
+                <select asp-for="Gender" class="form-select">
+                    <option value="">-- Select Gender --</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                </select>
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="PhoneNumber" class="form-label">
+                    <i class="fas fa-phone"></i> Phone Number
+                </label>
+                <input asp-for="PhoneNumber" class="form-control" placeholder="Enter your phone number" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Address" class="form-label">
+                    <i class="fas fa-map-marker-alt"></i> Address
+                </label>
+                <textarea asp-for="Address" class="form-control" rows="4" placeholder="Enter your address"></textarea>
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a class="btn btn-secondary" href="@Url.Action("Index")">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

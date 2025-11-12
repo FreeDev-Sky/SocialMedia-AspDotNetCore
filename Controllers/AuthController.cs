@@ -1,39 +1,41 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SocialMedia_AspDotNetCore.DTOs;
 using SocialMedia_AspDotNetCore.Models;
-using SocialMedia_AspDotNetCore.Services;
 
 namespace SocialMedia_AspDotNetCore.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    public class AuthController : Controller
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly JwtService _jwtService;
+        private readonly ApplicationDbContext _dbContext;
 
         public AuthController(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
-            JwtService jwtService)
+            ApplicationDbContext dbContext)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _jwtService = jwtService;
+            _dbContext = dbContext;
         }
 
-        [HttpPost("register")]
-        public async Task<ActionResult<AuthResponseDto>> Register(RegisterDto model)
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterDto model)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new AuthResponseDto
-                {
-                    IsSuccess = false,
-                    Message = "Invalid model state"
-                });
+                ViewBag.Error = "Please fill in all required fields correctly.";
+                return View(model);
             }
 
             var user = new User
@@ -48,74 +50,68 @@ namespace SocialMedia_AspDotNetCore.Controllers
 
             if (result.Succeeded)
             {
-                var token = _jwtService.GenerateToken(user);
-                return Ok(new AuthResponseDto
+                // Automatically create a profile for the new user
+                var profile = new Profile
                 {
-                    IsSuccess = true,
-                    Message = "User registered successfully",
-                    Token = token,
-                    Email = user.Email ?? "",
-                    FirstName = user.FirstName ?? "",
-                    LastName = user.LastName ?? ""
-                });
+                    UserId = user.Id,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _dbContext.Profiles.Add(profile);
+                await _dbContext.SaveChangesAsync();
+
+                // Sign in with cookie authentication (not JWT)
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return RedirectToAction("Index", "Home");
             }
 
-            return BadRequest(new AuthResponseDto
-            {
-                IsSuccess = false,
-                Message = string.Join(", ", result.Errors.Select(e => e.Description))
-            });
+            ViewBag.Error = string.Join(", ", result.Errors.Select(e => e.Description));
+            return View(model);
         }
 
-        [HttpPost("login")]
-        public async Task<ActionResult<AuthResponseDto>> Login(LoginDto model)
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginDto model, string? returnUrl = null)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new AuthResponseDto
-                {
-                    IsSuccess = false,
-                    Message = "Invalid model state"
-                });
+                ViewBag.Error = "Please fill in all required fields correctly.";
+                return View(model);
             }
 
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
-                return BadRequest(new AuthResponseDto
-                {
-                    IsSuccess = false,
-                    Message = "Invalid email or password"
-                });
+                ViewBag.Error = "Invalid email or password.";
+                return View(model);
             }
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
+            var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, lockoutOnFailure: false);
             if (result.Succeeded)
             {
-                var token = _jwtService.GenerateToken(user);
-                return Ok(new AuthResponseDto
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 {
-                    IsSuccess = true,
-                    Message = "Login successful",
-                    Token = token,
-                    Email = user.Email ?? "",
-                    FirstName = user.FirstName ?? "",
-                    LastName = user.LastName ?? ""
-                });
+                    return Redirect(returnUrl);
+                }
+                return RedirectToAction("Index", "Home");
             }
 
-            return BadRequest(new AuthResponseDto
-            {
-                IsSuccess = false,
-                Message = "Invalid email or password"
-            });
+            ViewBag.Error = "Invalid email or password.";
+            return View(model);
         }
 
-        [HttpPost("logout")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return Ok(new { Message = "Logout successful" });
+            return RedirectToAction("Index", "Home");
         }
     }
 }

@@ -1,29 +1,65 @@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome to Social Media App</h1>
-    <p>Your social networking platform with authentication.</p>
-    
-    <div class="row mt-5">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Login</h5>
-                    <p class="card-text">Already have an account? Sign in here.</p>
-                    <a href="/Home/Login" class="btn btn-primary">Login</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Register</h5>
-                    <p class="card-text">New to our platform? Create an account.</p>
-                    <a href="/Home/Register" class="btn btn-success">Register</a>
-                </div>
-            </div>
-        </div>
+<div class="text-center py-5 fade-in">
+    <div class="mb-5">
+        <h1 class="display-3 text-gradient mb-3">
+            <i class="fas fa-users"></i> Welcome to Social Media
+        </h1>
+        <p class="lead text-muted">Your modern social networking platform</p>
     </div>
+    
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-8">
+                <div class="card shadow-custom">
+                    <div class="card-body p-5">
+                        <h3 class="mb-3">
+                            <i class="fas fa-check-circle text-success"></i> You're logged in!
+                        </h3>
+                        <p class="text-muted mb-4">Welcome back! Visit your profile to manage your information.</p>
+                        <a asp-controller="Profile" asp-action="Index" class="btn btn-primary btn-lg">
+                            <i class="fas fa-user-circle"></i> Go to My Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-5 mb-4">
+                <div class="card shadow-custom h-100">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-sign-in-alt fa-3x text-primary"></i>
+                        </div>
+                        <h4 class="card-title mb-3">Login</h4>
+                        <p class="card-text text-muted">Already have an account? Sign in to continue.</p>
+                        <a asp-controller="Home" asp-action="Login" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5 mb-4">
+                <div class="card shadow-custom h-100">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-user-plus fa-3x text-success"></i>
+                        </div>
+                        <h4 class="card-title mb-3">Register</h4>
+                        <p class="card-text text-muted">New to our platform? Create your account now.</p>
+                        <a asp-controller="Home" asp-action="Register" class="btn btn-success btn-lg w-100">
+                            <i class="fas fa-user-plus"></i> Register
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
