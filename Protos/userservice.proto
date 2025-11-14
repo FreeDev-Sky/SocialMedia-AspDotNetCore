@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+option csharp_namespace = "SocialMedia_AspDotNetCore.Protos";
+
+package userservice;
+
+// User service definition
+service UserService {
+  // Get user by ID
+  rpc GetUser (GetUserRequest) returns (UserResponse);
+  
+  // Get all users
+  rpc GetAllUsers (GetAllUsersRequest) returns (GetAllUsersResponse);
+  
+  // Get user count
+  rpc GetUserCount (GetUserCountRequest) returns (GetUserCountResponse);
+}
+
+// Request messages
+message GetUserRequest {
+  string user_id = 1;
+}
+
+message GetAllUsersRequest {
+  int32 page_number = 1;
+  int32 page_size = 2;
+}
+
+message GetUserCountRequest {
+}
+
+// Response messages
+message UserResponse {
+  string user_id = 1;
+  string username = 2;
+  string email = 3;
+  bool is_active = 4;
+  string created_at = 5;
+}
+
+message GetAllUsersResponse {
+  repeated UserResponse users = 1;
+  int32 total_count = 2;
+  int32 page_number = 3;
+  int32 page_size = 4;
+}
+
+message GetUserCountResponse {
+  int32 count = 1;
+}
+

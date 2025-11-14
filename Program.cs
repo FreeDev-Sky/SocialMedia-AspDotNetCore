@@ -71,6 +71,10 @@ builder.Services.AddScoped<JwtService>();
 // Add SignalR
 builder.Services.AddSignalR();
 
+// Add gRPC
+builder.Services.AddGrpc();
+builder.Services.AddGrpcReflection();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -95,5 +99,14 @@ app.MapControllerRoute(
 
 // Map SignalR hub
 app.MapHub<ChatHub>("/chathub");
+
+// Map gRPC service
+app.MapGrpcService<UserService>();
+
+// Enable gRPC reflection in development (useful for testing with tools like Postman or gRPCurl)
+if (app.Environment.IsDevelopment())
+{
+    app.MapGrpcReflectionService();
+}
 
 app.Run();
